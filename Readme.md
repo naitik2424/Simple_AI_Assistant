@@ -5,7 +5,7 @@ A simple AI assistant built using Python, Ollama, and the OpenAI Python SDK.
 ## Technologies Used
 - Python
 - Ollama
-- Qwen 4B
+- Qwen3 4B
 - OpenAI Python SDK
 - Python-dotenv
 
@@ -37,7 +37,7 @@ pip install -r requirements.txt
 Download Ollama and pull the model:
 
 ```bash
-ollama pull qwen:4b
+ollama pull qwen3:4b
 ```
 
 ### 6. Configure environment variables
