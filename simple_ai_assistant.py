@@ -11,6 +11,12 @@ client = OpenAI(
 )
 messages= []
 
+messages.append(
+    {
+        "role": "system",
+        "content": "Act like a very humble agent and respond always under 20 words."
+    }
+)
 while True:
     user_input = input("\nNaitik: ")
     if user_input.lower() in ["exit","quit","bye"]:
@@ -23,7 +29,8 @@ while True:
     )
     response = client.chat.completions.create(
         model=os.getenv("MODEL"),
-        messages=messages
+        messages=messages,
+        tools= TOOLS
     )
     messages.append(
         {
