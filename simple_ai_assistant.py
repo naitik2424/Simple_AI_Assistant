@@ -1,4 +1,3 @@
-
 from openai import OpenAI
 from dotenv import load_dotenv
 from tools import TOOLS,FUNCTION_NAME_TO_FUNCTION_MAP
@@ -35,7 +34,7 @@ while True:
         tools= TOOLS
     )
     msg = response.choices[0].message
-    if msg.tools_calls:
+    if msg.tool_calls:
         messages.append(msg)
 
         for tool_call in msg.tool_calls:
@@ -47,13 +46,14 @@ while True:
 
             messages.append({
                 "role" : "tool",
-                "tool_id" : tool_call.id,
+                "tool_call_id" : tool_call.id,
                 "content" : str(result),
             })
         #2nd call to LLM API
-        response = client.chat.completion.create(
+        response = client.chat.completions.create(
             model = os.getenv("MODEL"),
-            messages = messages
+            messages = messages,
+            tools = TOOLS
         )
 
         msg = response.choices[0].message
