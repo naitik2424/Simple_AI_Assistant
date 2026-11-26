@@ -1,8 +1,12 @@
+#standard library imports
+import os
+#Third-party import
 from openai import OpenAI
 from dotenv import load_dotenv
-from tools import TOOLS,FUNCTION_NAME_TO_FUNCTION_MAP
-import os
-import json
+#local modules
+from tools import TOOLS,run_tool
+from Utilities.utilities import log
+
 
 load_dotenv()
 
@@ -23,7 +27,7 @@ messages.append(
 
 #chat loop start here
 while True:
-    user_input = input("\nNaitik: ")
+    user_input = input("\n 🧑 Naitik : ")
     if user_input.lower() in ["exit","quit","bye"]:
         break
     messages.append(
@@ -43,17 +47,11 @@ while True:
         if not msg.tool_calls:
             break
 
+        log(f"Step {step+1} : model requested{len(msg.tool_calls)} tool calls")
         messages.append(msg)
 
         for tool_call in msg.tool_calls:
-            func_name =tool_call.function.name
-            func_args={}
-            try:
-                func_args = json.loads(tool_call.function.arguments or "{}")
-                fn = FUNCTION_NAME_TO_FUNCTION_MAP[func_name]
-                result= fn(**func_args)
-            except Exception as e:
-                result = f"Error while running {func_name}: {e}"  "
+            result = run_tool(tool_call)
             messages.append({
                 "role" : "tool",
                 "tool_call_id" : tool_call.id,
@@ -66,15 +64,14 @@ while True:
         #Ran out of steps : The model never gave the final answer
         fallback = "Sorry, I could not finish this within the step limit"
         messages.append({
-                        "role" : "tool",
-                        "tool_call_id" : tool_call.id,
-                        "content" : str(result),
+                        "role" : "assistant",
+                        "content" : fallback,
         })
-        print("Assistant: "+ fallback)
+        print("🤖 Assistant: "+ fallback)
         continue
         
     messages.append({
         "role":"assistant",
-        "content": msg.content
+        "content": msg.content,
     })
-    print("Assistant: " + msg.content)
+    print("🤖 Assistant: " + (msg.content  or ""))()
